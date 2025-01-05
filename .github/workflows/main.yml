@@ -50,4 +50,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: your-dockerhub-username/helloworld-app:${{ env.new_version }}
+          tags: ahmetgrbzz/helloworld-app:${{ env.new_version }}
