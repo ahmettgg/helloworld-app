@@ -30,4 +30,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ahmetgrbzz/helloworld-app:latest
+          tags: ahmetgrbzz/helloworld-app:${{ github.event.inputs.version }}
