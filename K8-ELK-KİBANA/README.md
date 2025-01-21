@@ -110,7 +110,7 @@ Eğer Job başarısız olursa, pod loglarını kontrol edin:
 ```bash
 kubectl logs <job-pod-name>
 ```
-Elasticsearch ve Kibana Bağlantı Sorunları:
+###  Elasticsearch ve Kibana Bağlantı Sorunları:
 
 Kibana pod'unda kibana.yaml dosyasını kontrol edin.
 Doğru Elasticsearch URL'sinin ve kimlik bilgilerinin tanımlı olduğundan emin olun.
@@ -120,7 +120,7 @@ Servis türünü (ClusterIP, NodePort, LoadBalancer) ve port yapılandırmaları
 ```bash
 kubectl get svc
 ```
-Persistent Volume Sorunları:
+###  Persistent Volume Sorunları:
 
 Depolama sınıfı ve disk izinlerini kontrol edin.
 
