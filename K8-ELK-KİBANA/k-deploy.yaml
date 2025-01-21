@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        resources: {}
+        image: kibana:8.16.2
+        ports:
+        - containerPort: 5601
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://e-service.default.svc.cluster.local:9200"          
+        - name: ELASTICSEARCH_USERNAME
+          value: "kibana_system"
+        - name: NODE_OPTIONS
+          value: "--openssl-legacy-provider=false"
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: k-secret
+              key: ELASTICSEARCH_PASSWORD
+        

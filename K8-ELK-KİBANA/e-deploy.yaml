@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: e-deploy
+  name: e-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: e-deploy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: e-deploy
+    spec:
+      containers:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:8.16.2
+        name: elasticsearch
+        resources: {}
+        env:
+        - name: discovery.type
+          value: single-node
+        - name: xpack.security.enabled
+          value: "true"
+        - name: xpack.security.http.ssl.enabled
+          value: "false" # Eğer TLS şifreleme yapılandıracaksanız bunu true yapabilirsiniz
+        # - name: ELASTIC_PASSWORD
+        #   value: "HJ2qDhTJjvaohSvlyydN" 
+        - name: ELASTICSEARCH_URL
+          value: "http://e-service.default.svc.cluster.local:9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: "elastic"
+        envFrom:
+        - secretRef:
+            name: e-secret
+        # - configMapRef:
+        #     name: elasticsearch-config      
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - mountPath: "/var/lib/elasticsearch"
+          name: elk-pv-storage
+      volumes:
+      - name: elk-pv-storage
+        persistentVolumeClaim:
+          claimName: elasticsearch-pv-claim

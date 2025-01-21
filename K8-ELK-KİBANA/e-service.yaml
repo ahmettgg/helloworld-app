@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: e-deploy
+  name: e-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 9200
+    targetPort: 9200
+    nodePort: 30001
+  selector:
+    app: e-deploy
+  type: NodePort
+  

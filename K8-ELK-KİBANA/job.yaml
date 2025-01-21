@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: update-kibana-system-password
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+      - name: update-password
+        image: alpine
+        command:
+        - "sh"
+        - "-c"
+        - |
+          echo "Installing curl...";
+          apk add --no-cache curl;
+          echo "Updating password for kibana_system user...";
+          curl -v -X POST -u elastic:${ELASTIC_PASSWORD} \
+          "${ELASTICSEARCH_URL}/_security/user/kibana_system/_password" \
+          -H "Content-Type: application/json" \
+          -d '{"password": "'${ELASTICSEARCH_PASSWORD}'"}';
+        env:
+        env:
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: e-secret
+              key: ELASTIC_PASSWORD
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: k-secret
+              key: ELASTICSEARCH_PASSWORD
+        - name: ELASTICSEARCH_URL
+          value: "http://e-service.default.svc.cluster.local:9200"  # cluster_ip yazılacak eğerki DNS çözümlemesinde sorun varsa.
+      restartPolicy: OnFailure
