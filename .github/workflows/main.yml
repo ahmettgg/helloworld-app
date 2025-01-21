@@ -28,30 +28,18 @@ jobs:
         id: versioning
         run: |
           # Docker Hub'dan mevcut etiketleri çek
-          tags=$(curl -s -u "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" \
-            https://hub.docker.com/v2/repositories/ahmetgrbzz/helloworld-app/tags | \
-            jq -r '.results[].name')
-
-          echo "Fetched tags: $tags"
-
-          # Eğer mevcut bir etiket yoksa v1 başlat
-          if [ -z "$tags" ]; then
-            new_version="v1.00"
+          latest_version=$(curl -s -u "${{ secrets.DOCKER_USERNAME }}:${{ secrets.DOCKER_PASSWORD }}" \
+            https://hub.docker.com/v2/repositories/your-dockerhub-username/helloworld-app/tags | \
+            jq -r '.results[].name' | grep -E '^v[0-9]+(\.[0-9]+)?$' | sort -V | tail -n 1)
+          
+          # Eğer bir etiket bulunamadıysa v1 olarak başlat
+          if [ -z "$latest_version" ]; then
+            new_version="v1"
           else
-            # En son versiyonu bul ve artır
-            latest_version=$(echo "$tags" | grep -E '^v[0-9]+(\.[0-9]+)?$' | sort -V | tail -n 1)
-            if [ -z "$latest_version" ]; then
-              new_version="v1.00"
-            else
-              # Major ve minor versiyon artırma
-              major=$(echo $latest_version | awk -F. '{print $1}' | tr -d 'v')
-              minor=$(echo $latest_version | awk -F. '{print $2}')
-              new_minor=$((10#$minor + 1))
-              new_version="v${major}.${new_minor}"
-            fi
+            # Versiyonu bir artır (örn: v1 -> v1.01)
+            new_version=$(echo $latest_version | awk -F. '{printf "v%d.%02d\n", $1, ($2+1)}')
           fi
 
-          echo "Latest version: $latest_version"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_ENV
 
