@@ -43,7 +43,11 @@ jobs:
             if [ -z "$latest_version" ]; then
               new_version="v1.00"
             else
-              new_version=$(echo $latest_version | awk -F. '{printf "v%d.%02d\n", $1, ($2+1)}')
+              # Major ve minor versiyon artırma
+              major=$(echo $latest_version | awk -F. '{print $1}' | tr -d 'v')
+              minor=$(echo $latest_version | awk -F. '{print $2}')
+              new_minor=$((10#$minor + 1))
+              new_version="v${major}.${new_minor}"
             fi
           fi
 
