@@ -32,6 +32,11 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Ensure ECR repository exists
+        run: |
+          aws ecr describe-repositories --repository-names "${{ env.ECR_REPOSITORY }}" >/dev/null 2>&1 \
+          || aws ecr create-repository --repository-name "${{ env.ECR_REPOSITORY }}" >/dev/null
+
       - name: Set short sha
         id: sha_short
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -44,7 +49,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        run: mvn -B -s settings.xml clean install -DskipTests
+        run: mvn clean install -DskipTests
 
       - name: Build & Push ${{ env.PROJECT_NAME }} Service
         uses: docker/build-push-action@v6
